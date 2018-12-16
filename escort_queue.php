@@ -1,26 +1,4 @@
 <?php
-/**
- * User: marksilliman
- * Date: 1/28/15
- * Time: 12:20 PM
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- */
-
 require_once "./db.php";
 
 //insert a pose into queue
@@ -136,8 +114,6 @@ class escort_queue {
 
         //count how many pending
         //대기열 카운팅
-        //우리가 이게 필요한가?
-        //우리는 목적지 한번 갔다가 이니셜포즈 회귀를 반복하는 흐름
         $result = $this->conn->query("select COUNT(*) as how_many_before from QUEUE where status = " . $this->status_to_numeric_value("pending") . " AND ID < " . $id) or die("status pending count failed");
         $row = $result->fetch_assoc() or die("status pending count 2 failed");
         $a["how-many-are-pending-before-id"] = (int) $row["how_many_before"];
@@ -177,7 +153,6 @@ class escort_queue {
     //pop
     //this isn't a true pop: poses remain in the queue until an update is sent via turtlebot (e.g. when it arrives at the pose)
     //목적지에 도착할때까지 위치값은 큐에 남아있음
-    //목적지에 도착하고 업데이트를 해줘야 비워지는건가?
     public function pop() {
         $a = array();
         $a["status"] = "empty";
@@ -204,7 +179,6 @@ class escort_queue {
 
     //exists
     //check if the pose already is pending (so we don't add duplicates)
-    //중복 방지 -> 우리한테는 필요없음 필요없을걸?
     private function exists($pose,$return_id = false) {
         $query = "select id from QUEUE where status = " . $this->status_to_numeric_value("pending") . " AND point_x  = " . $pose["point_x"] . " AND point_y = " . $pose["point_y"] . " AND point_z = " . $pose["point_z"] . " AND quat_x = " . $pose["quat_x"] . " AND quat_y = " . $pose["quat_y"] . " AND quat_z = " . $pose["quat_z"] . " AND quat_w = " . $pose["quat_w"];
         $result = $this->conn->query($query) or die("exists query failed");
